@@ -70,7 +70,7 @@ def compute_accuracy(predictions, y):
         return np.mean(np.equal(predictions.numpy(), y.numpy()))
 
 
-def train_model(train_data, dev_data, model, lr=0.002, momentum=0.9, nesterov=False, n_epochs=120):
+def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=False, n_epochs=30):
     """Train a model for N epochs given data and hyper-params."""
     
     #modify to enable CUDA
@@ -97,7 +97,7 @@ def train_model(train_data, dev_data, model, lr=0.002, momentum=0.9, nesterov=Fa
         # Save model
         torch.save(model, 'mnist_model_fully_connected.pt')
         
-        lr = lr * 0.8
+        lr = lr * 0.85
 
 
 def run_epoch(data, model, optimizer):
