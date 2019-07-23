@@ -13,79 +13,35 @@ class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
-#replace batchify with CUDA version
-#def batchify_data(x_data, y_data, batch_size):
-#    """Takes a set of data points and labels and groups them into batches."""
-#    # Only take batch_size chunks (i.e. drop the remainder)
-#    N = int(len(x_data) / batch_size) * batch_size
-#    batches = []
-#    for i in range(0, N, batch_size):
-#        batches.append({
-#            'x': torch.tensor(x_data[i:i + batch_size],
-#                              dtype=torch.float32),
-#            'y': torch.tensor([y_data[0][i:i + batch_size],
-#                               y_data[1][i:i + batch_size]],
-#                               dtype=torch.int64)
-#        })
-#    return batches
 
 def batchify_data(x_data, y_data, batch_size):
     """Takes a set of data points and labels and groups them into batches."""
     # Only take batch_size chunks (i.e. drop the remainder)
-
-
     N = int(len(x_data) / batch_size) * batch_size
     batches = []
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        for i in range(0, N, batch_size):
-            batches.append({
-                'x': torch.tensor(x_data[i:i + batch_size],
-                                  dtype=torch.float32).to(device),
-                'y': torch.tensor([y_data[0][i:i + batch_size],
-                                   y_data[1][i:i + batch_size]],
-                                   dtype=torch.int64).to(device)
-            })
-    else:
-        for i in range(0, N, batch_size):
-            batches.append({
-                'x': torch.tensor(x_data[i:i + batch_size],
-                                  dtype=torch.float32),
-                'y': torch.tensor([y_data[0][i:i + batch_size],
-                                   y_data[1][i:i + batch_size]],
-                                   dtype=torch.int64)
-            })
+    for i in range(0, N, batch_size):
+        batches.append({
+            'x': torch.tensor(x_data[i:i + batch_size],
+                              dtype=torch.float32),
+            'y': torch.tensor([y_data[0][i:i + batch_size],
+                               y_data[1][i:i + batch_size]],
+                               dtype=torch.int64)
+        })
     return batches
 
-#Replace compute_accuracy with CUDA version
-#def compute_accuracy(predictions, y):
-#    """Computes the accuracy of predictions against the gold labels, y."""
-#    return np.mean(np.equal(predictions.numpy(), y.numpy()))
 
 def compute_accuracy(predictions, y):
     """Computes the accuracy of predictions against the gold labels, y."""
-    if y.device.type == 'cuda':
-        return np.mean(np.equal(predictions.cpu().numpy(), y.cpu().numpy()))
-    else:
-        return np.mean(np.equal(predictions.numpy(), y.numpy()))
+    return np.mean(np.equal(predictions.numpy(), y.numpy()))
 
 
 def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=False, n_epochs=30):
     """Train a model for N epochs given data and hyper-params."""
-    
-    #modify to enable CUDA
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        model.cuda(device)
-        
     # We optimize with SGD
-    lr = 0.01
-    #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
 
     for epoch in range(1, n_epochs + 1):
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
         print("-------------\nEpoch {}:\n".format(epoch))
-        print("learning rate = ", lr)
 
         # Run **training***
         loss, acc = run_epoch(train_data, model.train(), optimizer)
@@ -97,8 +53,6 @@ def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=Fal
 
         # Save model
         torch.save(model, 'mnist_model_fully_connected.pt')
-        
-        lr = lr * 0.85
 
 
 def run_epoch(data, model, optimizer):
