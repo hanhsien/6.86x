@@ -24,9 +24,9 @@ class CNN(nn.Module):
         ch1 = 64
         ch2 = ch1 * 2
         i = 3
-        j = int(((int(((42 - i + 1- i + 1)-1)/2) - i + 1 - i + 1)-1)/2)
+        j = int(((int(((42 - i + 1 - i + 1 - i + 1)-1)/2) - i + 1 - i + 1 - i + 1)-1)/2)
 
-        k = int(((int(((28 - i + 1- i + 1)-1)/2) - i + 1 - i + 1)-1)/2)
+        k = int(((int(((28 - i + 1 - i + 1 - i + 1)-1)/2) - i + 1 - i + 1 - i + 1)-1)/2)
         
         self.flatten = Flatten()
         self.conv1 = nn.Conv2d(1, ch1, (i, i))
@@ -48,13 +48,13 @@ class CNN(nn.Module):
         #input image 42x28
         x = self.conv1(x)
         x = self.conv3(x)
-        #x = self.conv3(x)          
+        x = self.conv3(x)          
         #38x24x32
         x = self.maxpool(x)
         x = self.relu(x)
         #x = self.dropout(x)
         #18x11x32
-        #x = self.conv3(x)
+        x = self.conv3(x)
         x = self.conv3(x)  
         x = self.conv2(x)
         #14x7x64
