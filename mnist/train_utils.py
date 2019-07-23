@@ -79,9 +79,11 @@ def train_model(train_data, dev_data, model, lr=0.002, momentum=0.9, nesterov=Fa
         model.cuda(device)
         
     # We optimize with SGD
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
+    lr = 0.01
+    #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
 
     for epoch in range(1, n_epochs + 1):
+        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
         print("-------------\nEpoch {}:\n".format(epoch))
 
         # Run **training***
@@ -94,6 +96,8 @@ def train_model(train_data, dev_data, model, lr=0.002, momentum=0.9, nesterov=Fa
 
         # Save model
         torch.save(model, 'mnist_model_fully_connected.pt')
+        
+        lr = lr * 0.8
 
 
 def run_epoch(data, model, optimizer):
