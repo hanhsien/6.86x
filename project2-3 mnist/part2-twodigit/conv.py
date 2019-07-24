@@ -24,9 +24,9 @@ class CNN(nn.Module):
         ch1 = 64
         ch2 = ch1 * 2
         i = 3
-        j = int(((int(((42 - i + 1-2-2)-1)/2) - i + 1-2-2)-1)/2)
+        j = int(((int(((42 - i + 1 - i + 1)-1)/2) - i + 1 - i + 1)-1)/2)
 
-        k = int(((int(((28 - i + 1-2-2)-1)/2) - i + 1-2-2)-1)/2)
+        k = int(((int(((28 - i + 1 - i + 1)-1)/2) - i + 1 - i + 1)-1)/2)
         
         self.flatten = Flatten()
         self.conv1 = nn.Conv2d(1, ch1, (i, i))
