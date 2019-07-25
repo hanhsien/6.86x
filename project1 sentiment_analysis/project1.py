@@ -41,7 +41,11 @@ def hinge_loss_single(feature_vector, label, theta, theta_0):
     hinge_loss = np.average(np.where(test>=1, 0, 1-test))
     
     return hinge_loss
-#pragma: coderesponse end
+    
+    #official answer
+    y = np.dot(theta, feature_vector) + theta_0
+    loss = max(0.0, 1 - y * label)    #pragma: coderesponse end
+    return loss
 
 
 #pragma: coderesponse template
@@ -71,6 +75,11 @@ def hinge_loss_full(feature_matrix, labels, theta, theta_0):
     
     return HL
 
+    #official answer
+    loss = 0
+    for i in range(len(feature_matrix)):
+        loss += hinge_loss_single(feature_matrix[i], labels[i], theta, theta_0)
+    return loss / len(labels)
 #pragma: coderesponse end
 
 
@@ -103,6 +112,12 @@ def perceptron_single_step_update(
         current_theta_0 += label
     
     return current_theta, current_theta_0
+
+    #official answer
+    if label * (np.dot(current_theta, feature_vector) + current_theta_0) <= 0:
+        current_theta += label * feature_vector
+        current_theta_0 += label
+    return (current_theta, current_theta_0)    
 #pragma: coderesponse end
 
 
@@ -144,6 +159,16 @@ def perceptron(feature_matrix, labels, T):
             theta, theta_0 = perceptron_single_step_update(feature_vector, label, theta, theta_0)
             
     return theta, theta_0
+
+    #official answer
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta = np.zeros(nfeatures)
+    theta_0 = 0.0
+    for t in range(T):
+        for i in get_order(nsamples):
+            theta, theta_0 = perceptron_single_step_update(
+                feature_matrix[i], labels[i], theta, theta_0)
+    return (theta, theta_0)
 #pragma: coderesponse end
 
 
@@ -194,6 +219,20 @@ def average_perceptron(feature_matrix, labels, T):
             sumtheta_0 += theta_0
           
     return sumtheta/n/T, sumtheta_0/n/T  
+
+    #official answer
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta = np.zeros(nfeatures)
+    theta_sum = np.zeros(nfeatures)
+    theta_0 = 0.0
+    theta_0_sum = 0.0
+    for t in range(T):
+        for i in get_order(nsamples):
+            theta, theta_0 = perceptron_single_step_update(
+                feature_matrix[i], labels[i], theta, theta_0)
+            theta_sum += theta
+            theta_0_sum += theta_0
+    return (theta_sum / (nsamples * T), theta_0_sum / (nsamples * T))
 #pragma: coderesponse end
 
 
@@ -232,6 +271,13 @@ def pegasos_single_step_update(
         current_theta = (1-eta*L)*current_theta
     
     return current_theta, current_theta_0
+
+    #official answer
+    mult = 1 - (eta * L)
+    if label * (np.dot(feature_vector, current_theta) + current_theta_0) <= 1:
+        return ((mult * current_theta) + (eta * label * feature_vector),
+                (current_theta_0) + (eta * label))
+    return (mult * current_theta, current_theta_0)
 #pragma: coderesponse end
 
 
@@ -280,6 +326,19 @@ def pegasos(feature_matrix, labels, T, L):
             count += 1
             
     return theta, theta_0
+
+    #official answer
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta = np.zeros(nfeatures)
+    theta_0 = 0
+    count = 0
+    for t in range(T):
+        for i in get_order(nsamples):
+            count += 1
+            eta = 1.0 / np.sqrt(count)
+            (theta, theta_0) = pegasos_single_step_update(
+                feature_matrix[i], labels[i], L, eta, theta, theta_0)
+    return (theta, theta_0)
 #pragma: coderesponse end
 
 # Part II
@@ -307,6 +366,18 @@ def classify(feature_matrix, theta, theta_0):
     epsilon = 1e-9
     a = np.dot(theta,np.transpose(feature_matrix))+theta_0 - epsilon
     return (a > 0) * 2. -1
+
+    #official answer
+    (nsamples, nfeatures) = feature_matrix.shape
+    predictions = np.zeros(nsamples)
+    for i in range(nsamples):
+        feature_vector = feature_matrix[i]
+        prediction = np.dot(theta, feature_vector) + theta_0
+        if (prediction > 0):
+            predictions[i] = 1
+        else:
+            predictions[i] = -1
+    return predictions
 
 #pragma: coderesponse end
 
@@ -353,8 +424,13 @@ def classifier_accuracy(
     
     return train_accuracy, val_accuracy
 
-  
-    
+    #official answer  
+    theta, theta_0 = classifier(train_feature_matrix, train_labels, **kwargs)
+    train_predictions = classify(train_feature_matrix, theta, theta_0)
+    val_predictions = classify(val_feature_matrix, theta, theta_0)
+    train_accuracy = accuracy(train_predictions, train_labels)
+    validation_accuracy = accuracy(val_predictions, val_labels)
+    return (train_accuracy, validation_accuracy)    
 #pragma: coderesponse end
 
 

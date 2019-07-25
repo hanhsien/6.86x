@@ -80,10 +80,10 @@ def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=Fal
         
     # We optimize with SGD
     lr = 0.01
-    #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
 
     for epoch in range(1, n_epochs + 1):
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
+        #optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, nesterov=nesterov)
         print("-------------\nEpoch {}:\n".format(epoch))
         print("learning rate = ", lr)
 
@@ -98,7 +98,7 @@ def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=Fal
         # Save model
         torch.save(model, 'mnist_model_fully_connected.pt')
         
-        lr = lr * 0.85
+        #lr = lr * 0.85
 
 
 def run_epoch(data, model, optimizer):

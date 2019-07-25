@@ -7,7 +7,7 @@ import utils_multiMNIST as U
 path_to_data_dir = '../Datasets/'
 use_mini_dataset = True
 
-batch_size = 64
+batch_size = 32
 nb_classes = 10
 nb_epoch = 30
 num_classes = 10
@@ -25,12 +25,14 @@ class MLP(nn.Module):
         #self.layer2b = nn.Linear(64, 10)
         self.layer2 = nn.Linear(64,20)
 
+
     def forward(self, x):
         xf = self.flatten(x)
         x = self.layer1(xf)
         #x1 = self.layer2a(x)
         #x2 = self.layer2b(x)
-        x = self.layer2(x)       
+        x = self.layer2(x)     
+
         
         out_first_digit = x[:,:10]
         out_second_digit = x[:,10:]
@@ -42,6 +44,7 @@ class MLP(nn.Module):
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)
+    #X_train, y_train = X_train[:1000], y_train[:1000]
 
     # Split into train and dev
     dev_split_index = int(9 * len(X_train) / 10)
