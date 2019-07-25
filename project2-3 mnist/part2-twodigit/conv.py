@@ -21,13 +21,13 @@ class CNN(nn.Module):
     def __init__(self, input_dimension):
         super(CNN, self).__init__()
         # TODO initialize model layers here
-        ch1 = 64
+        ch1 = 32
         ch2 = ch1 * 2
         ch3 = ch2 * 2
         i = 3
-        j = int(((int(((int(((42 - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2)
+        j = int(((int(((42 - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2)
 
-        k = int(((int(((int(((28 - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2)
+        k = int(((int(((28 - i*3 + 1*3)-1)/2) - i*3 + 1*3)-1)/2)
         
         self.flatten = Flatten()
         self.relu = nn.ReLU()
@@ -38,10 +38,11 @@ class CNN(nn.Module):
         self.conv4 = nn.Conv2d(ch1, ch2, (i, i))
         self.conv5 = nn.Conv2d(ch2, ch2, (i, i))
         self.conv6 = nn.Conv2d(ch2, ch2, (i, i))
-        self.conv7 = nn.Conv2d(ch2, ch2*2, (i, i))
-        self.conv8 = nn.Conv2d(ch2, ch2*2, (i, i))
-        self.conv9 = nn.Conv2d(ch2, ch2*2, (i, i))        
+        self.conv7 = nn.Conv2d(ch2, ch3, (i, i))
+        self.conv8 = nn.Conv2d(ch3, ch3, (i, i))
+        self.conv9 = nn.Conv2d(ch3, ch3, (i, i))        
         
+        self.dropout1 = nn.Dropout(0.1)
         self.dropout = nn.Dropout(0.5)
         self.fc11 = nn.Linear(j*k*ch3, j*k*ch3)
         self.fc12 = nn.Linear(j*k*ch3, j*k*ch3)
@@ -49,45 +50,41 @@ class CNN(nn.Module):
         self.fc22 = nn.Linear(j*k*ch3, j*k*ch3)
         self.final1 = nn.Linear(j*k*ch3, 10)
         self.final2 = nn.Linear(j*k*ch3, 10)
-
+        
+        
     def forward(self, x):
 
         # TODO use model layers to predict the two digits
         #input image 42x28
         x = self.conv1(x)
         x = self.relu(x)
+        x = self.dropout1(x)
         x = self.conv2(x)
         x = self.relu(x)
+        x = self.dropout1(x)
         x = self.conv3(x)
         x = self.relu(x)
         x = self.maxpool(x)
+        x = self.dropout1(x)
 
         x = self.conv4(x)
         x = self.relu(x)
+        x = self.dropout1(x)
         x = self.conv5(x)
         x = self.relu(x)
+        x = self.dropout1(x)
         x = self.conv6(x)
         x = self.relu(x)
         x = self.maxpool(x)               
-        #38x24x32
-        x = self.conv7(x)
-        x = self.relu(x)
-        x = self.conv8(x)
-        x = self.relu(x)
-        x = self.conv9(x)
-        x = self.relu(x)
-        x = self.maxpool(x)      
-        #18x11x32
 
-        #x = self.dropout(x)
-        #6x3x64
         x = self.flatten(x)
-        
+        x = self.dropout(x)
         x1 = self.fc11(x)
         x1 = self.relu(x1)
         x1 = self.dropout(x1)
         x1 = self.fc12(x)
         x1 = self.relu(x1)
+        x1 = self.dropout(x1)
         x1 = self.final1(x1)
         
         x2 = self.fc21(x)
@@ -95,6 +92,7 @@ class CNN(nn.Module):
         x2 = self.dropout(x2)
         x2 = self.fc22(x2)
         x2 = self.relu(x2)
+        x2 = self.dropout(x2)
         x2 = self.final2(x)
         
         out_first_digit = x1
