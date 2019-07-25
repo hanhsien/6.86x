@@ -98,7 +98,7 @@ def train_model(train_data, dev_data, model, lr=0.01, momentum=0.9, nesterov=Fal
         # Save model
         torch.save(model, 'mnist_model_fully_connected.pt')
         
-        #lr = lr * 0.85
+        lr = lr * 0.93
 
 
 def run_epoch(data, model, optimizer):
